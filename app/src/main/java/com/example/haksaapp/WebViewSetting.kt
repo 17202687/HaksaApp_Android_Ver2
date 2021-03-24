@@ -1,16 +1,21 @@
 package com.example.haksaapp
 
-import android.webkit.WebResourceRequest
-import android.webkit.WebSettings
-import android.webkit.WebView
-import android.webkit.WebViewClient
-import com.example.haksaapp.Util.HttpUrl.BASE_URL
+import android.content.Context
+import android.graphics.drawable.ColorDrawable
+import android.webkit.*
+import com.example.haksaapp.LoadingProgress.UrlChangeProgressDialog
+import com.example.haksaapp.Util.AppContext
+import com.example.haksaapp.Util.HttpUrl.CURRENT_URL
 import com.example.haksaapp.databinding.ActivityMainBinding
 
-class WebViewSetting {
+class WebViewSetting(context: Context){
 
     private lateinit var binding : ActivityMainBinding
-    private var currentUrl = BASE_URL
+    private lateinit var mContext: Context
+
+    init {
+        this.mContext = context
+    }
 
     public fun initBinding(binding: ActivityMainBinding){
         this.binding = binding
@@ -30,18 +35,26 @@ class WebViewSetting {
             cacheMode = WebSettings.LOAD_DEFAULT            //캐시 설정
         }
 
+        val customProgress = UrlChangeProgressDialog(context = mContext)
+
         binding.mainWebView.webViewClient = object : WebViewClient(){
             override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
+                customProgress.show()
                 if (url != null) {
-                    currentUrl = url
+                    CURRENT_URL = url
                 }
-                view?.loadUrl(currentUrl)
+                view?.loadUrl(CURRENT_URL)
                 return true
             }
 
-
+            override fun onPageFinished(view: WebView?, url: String?) {
+                super.onPageFinished(view, url)
+                customProgress.dismiss()
+            }
         }
 
-        binding.mainWebView.loadUrl(currentUrl)
+
+
+        binding.mainWebView.loadUrl(CURRENT_URL)
     }
 }
