@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.drawable.ColorDrawable
 import android.os.Handler
 import android.webkit.*
+import com.example.haksaapp.LoadingProgress.LoadingTimoutHandler
 import com.example.haksaapp.LoadingProgress.UrlChangeProgressDialog
 import com.example.haksaapp.Util.AppContext
 import com.example.haksaapp.Util.HttpUrl.CURRENT_URL
@@ -13,9 +14,6 @@ class WebViewSetting(context: Context){
 
     private lateinit var binding : ActivityMainBinding
     private lateinit var mContext: Context
-
-    // 로딩 창 띄울때 까지 시간측정
-    private var loadingTimer = false
 
     init {
         this.mContext = context
@@ -40,16 +38,12 @@ class WebViewSetting(context: Context){
         }
 
         val customProgress = UrlChangeProgressDialog(context = mContext)
+        val loadingProgressHandler = LoadingTimoutHandler.getInstace(customProgress)
 
         binding.mainWebView.webViewClient = object : WebViewClient(){
             override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
 
-                loadingTimer = true
-                Handler().postDelayed(Runnable {
-                    if(loadingTimer){
-                        customProgress.show()
-                    }
-                }, 1200)
+                loadingProgressHandler.dialogDelayShow()
 
                 if (url != null) {
                     CURRENT_URL = url
@@ -61,8 +55,7 @@ class WebViewSetting(context: Context){
 
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
-                loadingTimer = false
-                customProgress.dismiss()
+                loadingProgressHandler.dialogDelayDismiss()
             }
         }
 
