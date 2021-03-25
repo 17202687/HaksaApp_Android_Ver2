@@ -1,23 +1,17 @@
 package com.example.haksaapp
 
 import android.content.Context
-import android.graphics.drawable.ColorDrawable
-import android.os.Handler
 import android.webkit.*
-import com.example.haksaapp.LoadingProgress.LoadingTimoutHandler
+import com.example.haksaapp.LoadingProgress.InitLoadingHandler
+import com.example.haksaapp.LoadingProgress.ProgressDialogLoadingTimoutHandler
 import com.example.haksaapp.LoadingProgress.UrlChangeProgressDialog
-import com.example.haksaapp.Util.AppContext
 import com.example.haksaapp.Util.HttpUrl.CURRENT_URL
 import com.example.haksaapp.databinding.ActivityMainBinding
 
 class WebViewSetting(context: Context){
 
     private lateinit var binding : ActivityMainBinding
-    private lateinit var mContext: Context
-
-    init {
-        this.mContext = context
-    }
+    private var mContext: Context = context
 
     public fun initBinding(binding: ActivityMainBinding){
         this.binding = binding
@@ -37,29 +31,25 @@ class WebViewSetting(context: Context){
             cacheMode = WebSettings.LOAD_DEFAULT            //캐시 설정
         }
 
-        val customProgress = UrlChangeProgressDialog(context = mContext)
-        val loadingProgressHandler = LoadingTimoutHandler.getInstace(customProgress)
+        val loadingTimoutHandler = ProgressDialogLoadingTimoutHandler.getInstace(UrlChangeProgressDialog(mContext))
+        val initLoadingDialog = InitLoadingHandler.getInstace(mContext)
 
         binding.mainWebView.webViewClient = object : WebViewClient(){
             override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
-
-                loadingProgressHandler.dialogDelayShow()
-
                 if (url != null) {
                     CURRENT_URL = url
                 }
-
+                loadingTimoutHandler.dialogDelayShow()
                 view?.loadUrl(CURRENT_URL)
                 return true
             }
 
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
-                loadingProgressHandler.dialogDelayDismiss()
+                loadingTimoutHandler.dialogDelayDismiss()
+                initLoadingDialog.dialogDismiss()
             }
         }
-
-
 
         binding.mainWebView.loadUrl(CURRENT_URL)
     }

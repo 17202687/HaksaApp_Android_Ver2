@@ -2,8 +2,7 @@ package com.example.haksaapp.LoadingProgress
 
 import android.os.Handler
 
-class LoadingTimoutHandler(customProgress : UrlChangeProgressDialog) {
-
+class ProgressDialogLoadingTimoutHandler(customProgress: UrlChangeProgressDialog) {
     private lateinit var customProgress : UrlChangeProgressDialog
 
     init{
@@ -12,12 +11,12 @@ class LoadingTimoutHandler(customProgress : UrlChangeProgressDialog) {
 
     companion object{
         private var loadingTimer = false
-        private var instnce : LoadingTimoutHandler? = null
+        private var instnce : ProgressDialogLoadingTimoutHandler? = null
 
 
-        fun getInstace(customProgress: UrlChangeProgressDialog): LoadingTimoutHandler =
+        fun getInstace(customProgress: UrlChangeProgressDialog): ProgressDialogLoadingTimoutHandler =
                 instnce ?: synchronized(this) {
-                    instnce ?: LoadingTimoutHandler(customProgress).also {
+                    instnce ?: ProgressDialogLoadingTimoutHandler(customProgress).also {
                         instnce = it
                     }
                 }
@@ -38,4 +37,5 @@ class LoadingTimoutHandler(customProgress : UrlChangeProgressDialog) {
             this.customProgress.dismiss()
         },500)
     }
+
 }

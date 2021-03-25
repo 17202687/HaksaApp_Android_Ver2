@@ -15,6 +15,5 @@ public class UrlChangeProgressDialog(context: Context) : Dialog(context){
         super.onCreate(savedInstanceState)
         setContentView(DialogProgressBinding.inflate(layoutInflater).root)
         window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-
     }
 }

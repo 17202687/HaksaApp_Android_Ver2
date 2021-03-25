@@ -1,6 +1,7 @@
-package com.example.haksaapp.Util
+package com.example.haksaapp
 
 import android.app.Application
+import android.content.Context
 
 class AppContext : Application() {
     companion object{
@@ -12,5 +13,4 @@ class AppContext : Application() {
         super.onCreate()
         instance = this
     }
-
 }
