@@ -1,16 +1,18 @@
 package com.example.haksaapp
 
+import android.app.NotificationManager
+import android.content.Context
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
 import android.view.KeyEvent
-import android.view.animation.AnimationUtils
-import android.widget.ImageView
 import android.widget.Toast
 import com.example.haksaapp.LoadingProgress.InitLoadingHandler
 import com.example.haksaapp.databinding.ActivityMainBinding
 import com.example.haksaapp.Util.Utility.TAG
+import com.example.haksaapp.Util.CreateNotificationChannel
 
 class MainActivity : AppCompatActivity() {
 
@@ -36,6 +38,12 @@ class MainActivity : AppCompatActivity() {
             val initLoadingDialog = InitLoadingHandler.getInstace(this)
             initLoadingDialog.dialogShow()
             checkFirst = false
+
+            //채널 생성
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                //알람 채널 생성 매니저
+                CreateNotificationChannel().createNotificationChannel(getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
+            }
         }
 
         WebViewSetting(this).initBinding(binding)
