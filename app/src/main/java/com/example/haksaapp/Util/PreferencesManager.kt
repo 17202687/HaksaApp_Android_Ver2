@@ -23,7 +23,7 @@ class PreferencesManager {
     fun getString (context : Context, key : String) : String{
         val prefs = getPreferences(context)
         val value = prefs.getString(key, DEFAULT_VALUE_STRING)
-        return value!!
+        return value ?: ""
     }
 
     fun removeKey(context : Context, key : String){

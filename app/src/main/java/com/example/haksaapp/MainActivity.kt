@@ -13,6 +13,8 @@ import com.example.haksaapp.LoadingProgress.InitLoadingHandler
 import com.example.haksaapp.databinding.ActivityMainBinding
 import com.example.haksaapp.Util.Utility.TAG
 import com.example.haksaapp.Util.CreateNotificationChannel
+import com.example.haksaapp.Util.HttpUrl.BASE_URL
+import com.example.haksaapp.Util.HttpUrl.CURRENT_URL
 import com.example.haksaapp.WebView.WebViewSetting
 
 class MainActivity : AppCompatActivity() {
@@ -53,8 +55,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if((keyCode == KeyEvent.KEYCODE_BACK) && binding.mainWebView.canGoBack()){
-            binding.mainWebView.goBack()
-            return true
+            if(CURRENT_URL != BASE_URL && CURRENT_URL != BASE_URL + "Main") {
+                binding.mainWebView.goBack()
+                return true
+            }
         }
         if(!exitCheck){
             exitCheck = true

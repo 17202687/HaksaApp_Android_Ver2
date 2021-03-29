@@ -1,19 +1,31 @@
 package com.example.haksaapp.WebView
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.webkit.*
 import com.example.haksaapp.LoadingProgress.InitLoadingHandler
 import com.example.haksaapp.LoadingProgress.ProgressDialogLoadingTimoutHandler
 import com.example.haksaapp.LoadingProgress.UrlChangeProgressDialog
+import com.example.haksaapp.Util.HttpUrl.BASE_URL
 import com.example.haksaapp.Util.HttpUrl.CURRENT_URL
+import com.example.haksaapp.Util.PreferencesManager
 import com.example.haksaapp.databinding.ActivityMainBinding
 
 class WebViewSetting(context: Context){
 
     private lateinit var binding : ActivityMainBinding
     private var mContext: Context = context
+    private val cookieController = CookieController.getInstace()
+    private val preferencesManager = PreferencesManager()
 
+    @SuppressLint("SetJavaScriptEnabled")
     public fun initBinding(binding: ActivityMainBinding){
+
+        if(preferencesManager.getString(mContext, "studentID_saveServer") != ""){
+            CURRENT_URL = BASE_URL + "Main"
+            cookieController.AddCookie("studentID_save", preferencesManager.getString(mContext, "studentID_saveServe"))
+        }
+
         this.binding = binding
         binding.mainWebView.settings.apply {
             javaScriptEnabled = true                        // 자바스크립트 실행 허용
@@ -30,15 +42,18 @@ class WebViewSetting(context: Context){
 
             cacheMode = WebSettings.LOAD_DEFAULT            //캐시 설정
         }
-
         val loadingTimoutHandler = ProgressDialogLoadingTimoutHandler.getInstace(UrlChangeProgressDialog(mContext))
         val initLoadingDialog = InitLoadingHandler.getInstace(mContext)
 
         binding.mainWebView.webViewClient = object : WebViewClient(){
             override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
+                cookieController.MainCookieHandler(mContext)
+                cookieController.Print_Cookie()
+
                 if (url != null) {
                     CURRENT_URL = url
                 }
+
                 loadingTimoutHandler.dialogDelayShow()
                 view?.loadUrl(CURRENT_URL)
                 return true
