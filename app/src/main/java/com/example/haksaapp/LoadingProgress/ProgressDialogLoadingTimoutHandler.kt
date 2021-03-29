@@ -2,12 +2,7 @@ package com.example.haksaapp.LoadingProgress
 
 import android.os.Handler
 
-class ProgressDialogLoadingTimoutHandler(customProgress: UrlChangeProgressDialog) {
-    private lateinit var customProgress : UrlChangeProgressDialog
-
-    init{
-        this.customProgress = customProgress
-    }
+class ProgressDialogLoadingTimoutHandler(private var customProgress: UrlChangeProgressDialog) {
 
     companion object{
         private var loadingTimer = false

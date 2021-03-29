@@ -13,6 +13,7 @@ import com.example.haksaapp.LoadingProgress.InitLoadingHandler
 import com.example.haksaapp.databinding.ActivityMainBinding
 import com.example.haksaapp.Util.Utility.TAG
 import com.example.haksaapp.Util.CreateNotificationChannel
+import com.example.haksaapp.WebView.WebViewSetting
 
 class MainActivity : AppCompatActivity() {
 

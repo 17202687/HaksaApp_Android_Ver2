@@ -1,4 +1,4 @@
-package com.example.haksaapp
+package com.example.haksaapp.WebView
 
 import android.content.Context
 import android.webkit.*
