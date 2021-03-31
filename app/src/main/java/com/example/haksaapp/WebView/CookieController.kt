@@ -6,6 +6,8 @@ import android.webkit.CookieManager
 import com.example.haksaapp.Util.HttpUrl.CURRENT_URL
 import com.example.haksaapp.Util.PreferencesManager
 import com.example.haksaapp.Util.Utility.TAG
+import okhttp3.OkHttpClient
+import okhttp3.RequestBody
 
 class CookieController {
     private val cookieManager = CookieManager.getInstance()
@@ -23,24 +25,24 @@ class CookieController {
                 }
     }
 
-    fun AddCookie(cookieName: String, cookieDocumente : String){
+    fun addCookie(cookieName: String, cookieDocumente : String){
         cookieManager.setCookie(CURRENT_URL, cookieName + "=" + cookieDocumente)
     }
 
     //쿠키 Log
-    fun Print_Cookie () : HashMap<String, String>{
+    fun print_Cookie () : HashMap<String, String>{
         Log.d(TAG, "CookieController - Print_Cookie()")
         val cookies : String? = cookieManager.getCookie(CURRENT_URL)
         val parsing_cookies : HashMap<String, String>
-        parsing_cookies = ParsingCookie(cookies!!)
+        parsing_cookies = parsingCookie(cookies!!)
         for(parsing_cookie in parsing_cookies){
-            Log.d(TAG, parsing_cookie.key)
+            Log.d(TAG, "print_Cookie : " + parsing_cookie.key +"=" + parsing_cookie.value)
         }
         return parsing_cookies
     }
 
     //쿠키를 decoed해서 HashMap으로 반환
-    fun ParsingCookie (cookies : String) : HashMap<String, String>{
+    fun parsingCookie (cookies : String) : HashMap<String, String>{
         val cookie_split = cookies.split(";")
         val parsing_cookies : HashMap<String, String> = hashMapOf("" to "")
         for(cookie in cookie_split){
@@ -50,13 +52,16 @@ class CookieController {
         return parsing_cookies
     }
 
-    fun MainCookieHandler(context : Context){
-        val parsingCookie = ParsingCookie(cookieManager.getCookie(CURRENT_URL))
+    fun mainCookieHandler(context : Context){
+        val parsingCookie = parsingCookie(cookieManager.getCookie(CURRENT_URL))
         for(cookie in parsingCookie){
            when(cookie.key){
                "studentID_saveServer" -> preferencesManager.setString(context, "studentID_saveServer", cookie.value)
                "studentID_delete" -> preferencesManager.removeKey(context, "studentID_saveServer")
+               "studentID_temp" ->{
+                   val okhttpClient = OkHttpClient()
+                   }
            }
-        }
+       }
     }
 }

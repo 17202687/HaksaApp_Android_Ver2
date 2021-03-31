@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 
 class PreferencesManager {
-    public val PREFERENCES_NAME = "haksa_App_Data"
+    public val PREFERENCES_NAME = "haksa_App"
     val DEFAULT_VALUE_STRING = ""
 
     private fun getPreferences (context : Context) : SharedPreferences {

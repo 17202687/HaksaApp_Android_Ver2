@@ -2,12 +2,16 @@ package com.example.haksaapp.WebView
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Build
+import android.util.Log
 import android.webkit.*
+import com.example.haksaapp.Firebase.MyFirebaseMessagingService
 import com.example.haksaapp.LoadingProgress.LoadingFactory
 import com.example.haksaapp.Util.HttpUrl.BASE_URL
 import com.example.haksaapp.Util.HttpUrl.CURRENT_URL
 import com.example.haksaapp.Util.LoadingType
 import com.example.haksaapp.Util.PreferencesManager
+import com.example.haksaapp.Util.Utility.TAG
 import com.example.haksaapp.databinding.ActivityMainBinding
 
 class WebViewSetting(context: Context){
@@ -20,11 +24,13 @@ class WebViewSetting(context: Context){
     val loadingTimoutHandler = LoadingFactory().createLoading(LoadingType.ChangeUrlLoading, mContext)
 
     @SuppressLint("SetJavaScriptEnabled")
-    public fun initBinding(binding: ActivityMainBinding){
+    fun initBinding(binding: ActivityMainBinding){
 
-        if(preferencesManager.getString(mContext, "studentID_saveServer") != ""){
-            CURRENT_URL = BASE_URL + "Main"
-            cookieController.AddCookie("studentID_save", preferencesManager.getString(mContext, "studentID_saveServe"))
+       // 현재 모바일 데이터 서버 전송
+        cookieController.addCookie( "DeviceModel",Build.MODEL.toString())
+        cookieController.addCookie("DeviceVersion","Android_" + Build.VERSION.RELEASE)
+        MyFirebaseMessagingService().getToken {
+            cookieController.addCookie( "FBTOK",it)
         }
 
         initLoading.showDialog()
@@ -49,8 +55,8 @@ class WebViewSetting(context: Context){
 
         binding.mainWebView.webViewClient = object : WebViewClient(){
             override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
-                cookieController.MainCookieHandler(mContext)
-                cookieController.Print_Cookie()
+                cookieController.mainCookieHandler(mContext)
+                cookieController.print_Cookie()
 
                 if (url != null) {
                     CURRENT_URL = url

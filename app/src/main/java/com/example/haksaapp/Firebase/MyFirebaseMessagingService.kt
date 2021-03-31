@@ -15,19 +15,28 @@ import com.google.firebase.messaging.RemoteMessage
 import kotlin.random.Random
 import com.example.haksaapp.Util.Utility.TAG
 import com.example.haksaapp.Util.Utility.CHANNEL_ID
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
 
 @SuppressLint("MissingFirebaseInstanceTokenRefresh")
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     //새 토큰 생성 시 호출
     override fun onNewToken(token: String) {
-        Log.d(TAG, "onNewToken")
-        Log.d(TAG, token)
-        sendRegistrationToServer(token)
     }
 
-    private fun sendRegistrationToServer(token: String) {
-        //웹으로 토큰 전송 시 사용
+    fun getToken(callback: (String)->Unit){
+        var token = ""
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w(TAG, "Fetching FCM registration token failed", task.exception)
+                return@OnCompleteListener
+            }
+            // Get new FCM registration token
+            token = task.result.toString()
+            Log.d(TAG, "getToken: $token")
+            callback(token)
+        })
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
