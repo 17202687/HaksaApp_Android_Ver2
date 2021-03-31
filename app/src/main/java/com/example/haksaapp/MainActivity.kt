@@ -9,7 +9,6 @@ import android.os.Handler
 import android.util.Log
 import android.view.KeyEvent
 import android.widget.Toast
-import com.example.haksaapp.LoadingProgress.InitLoadingHandler
 import com.example.haksaapp.databinding.ActivityMainBinding
 import com.example.haksaapp.Util.Utility.TAG
 import com.example.haksaapp.Util.CreateNotificationChannel
@@ -37,9 +36,6 @@ class MainActivity : AppCompatActivity() {
 
         // 최초 실행시 사용할 코도
         if(checkFirst) {
-            Log.d(TAG, "onCreate: isFinishing")
-            val initLoadingDialog = InitLoadingHandler.getInstace(this)
-            initLoadingDialog.dialogShow()
             checkFirst = false
 
             //채널 생성

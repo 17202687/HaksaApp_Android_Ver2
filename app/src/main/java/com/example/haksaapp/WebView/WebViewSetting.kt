@@ -3,11 +3,10 @@ package com.example.haksaapp.WebView
 import android.annotation.SuppressLint
 import android.content.Context
 import android.webkit.*
-import com.example.haksaapp.LoadingProgress.InitLoadingHandler
-import com.example.haksaapp.LoadingProgress.ProgressDialogLoadingTimoutHandler
-import com.example.haksaapp.LoadingProgress.UrlChangeProgressDialog
+import com.example.haksaapp.LoadingProgress.LoadingFactory
 import com.example.haksaapp.Util.HttpUrl.BASE_URL
 import com.example.haksaapp.Util.HttpUrl.CURRENT_URL
+import com.example.haksaapp.Util.LoadingType
 import com.example.haksaapp.Util.PreferencesManager
 import com.example.haksaapp.databinding.ActivityMainBinding
 
@@ -17,6 +16,8 @@ class WebViewSetting(context: Context){
     private var mContext: Context = context
     private val cookieController = CookieController.getInstace()
     private val preferencesManager = PreferencesManager()
+    val initLoading = LoadingFactory().createLoading(LoadingType.InitLoading, mContext)
+    val loadingTimoutHandler = LoadingFactory().createLoading(LoadingType.ChangeUrlLoading, mContext)
 
     @SuppressLint("SetJavaScriptEnabled")
     public fun initBinding(binding: ActivityMainBinding){
@@ -25,6 +26,8 @@ class WebViewSetting(context: Context){
             CURRENT_URL = BASE_URL + "Main"
             cookieController.AddCookie("studentID_save", preferencesManager.getString(mContext, "studentID_saveServe"))
         }
+
+        initLoading.showDialog()
 
         this.binding = binding
         binding.mainWebView.settings.apply {
@@ -42,8 +45,7 @@ class WebViewSetting(context: Context){
 
             cacheMode = WebSettings.LOAD_DEFAULT            //캐시 설정
         }
-        val loadingTimoutHandler = ProgressDialogLoadingTimoutHandler.getInstace(UrlChangeProgressDialog(mContext))
-        val initLoadingDialog = InitLoadingHandler.getInstace(mContext)
+
 
         binding.mainWebView.webViewClient = object : WebViewClient(){
             override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
@@ -54,15 +56,15 @@ class WebViewSetting(context: Context){
                     CURRENT_URL = url
                 }
 
-                loadingTimoutHandler.dialogDelayShow()
+                loadingTimoutHandler.showDialog()
                 view?.loadUrl(CURRENT_URL)
                 return true
             }
 
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
-                loadingTimoutHandler.dialogDelayDismiss()
-                initLoadingDialog.dialogDismiss()
+                loadingTimoutHandler.dismissDialog()
+                initLoading.dismissDialog()
             }
         }
 
