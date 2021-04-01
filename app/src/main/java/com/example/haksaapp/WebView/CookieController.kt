@@ -1,17 +1,27 @@
 package com.example.haksaapp.WebView
 
 import android.content.Context
+import android.os.Build
 import android.util.Log
 import android.webkit.CookieManager
+import androidx.annotation.RequiresApi
+import com.example.haksaapp.Firebase.MyFirebaseMessagingService
 import com.example.haksaapp.Util.HttpUrl.CURRENT_URL
 import com.example.haksaapp.Util.PreferencesManager
 import com.example.haksaapp.Util.Utility.TAG
+import com.example.haksaapp.Util.Utility.URL_SET_FCM
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import okhttp3.FormBody
 import okhttp3.OkHttpClient
-import okhttp3.RequestBody
+import okhttp3.Request
+import java.lang.Exception
 
 class CookieController {
     private val cookieManager = CookieManager.getInstance()
     private val preferencesManager = PreferencesManager()
+    private var checkFirst = true
 
     companion object{
         private var instnce : CookieController? = null
@@ -59,9 +69,41 @@ class CookieController {
                "studentID_saveServer" -> preferencesManager.setString(context, "studentID_saveServer", cookie.value)
                "studentID_delete" -> preferencesManager.removeKey(context, "studentID_saveServer")
                "studentID_temp" ->{
-                   val okhttpClient = OkHttpClient()
+                   if(checkFirst) {
+                       MyFirebaseMessagingService().getToken {
+                           Log.d(TAG, "mainCookieHandler: $it")
+                           val okhttpClient = OkHttpClient()
+                           val requestBody = FormBody.Builder().apply {
+                               add("user_id", cookie.value)
+                               add("firebase_key", it)
+                           }.build()
+
+                           val request = Request.Builder().apply {
+                               url(URL_SET_FCM)
+                               post(requestBody)
+                           }.build()
+
+                           CoroutineScope(Dispatchers.Default).async {
+                               try {
+                                   val res = okhttpClient.newCall(request).execute()
+                                   Log.d(TAG, "mainCookieHandler: res : $res")
+                               } catch (e: Exception) {
+                                   e.printStackTrace()
+                                   Log.d(TAG, "mainCookieHandler Error: $e")
+                               }
+                           }
+                       }
+                       checkFirst = false
                    }
+               }
            }
        }
+    }
+
+    //모든 쿠키 삭제
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    fun DeleteCookie_All(){
+        Log.d(TAG, "CookieController - DeleteCookie_All()")
+        cookieManager.removeAllCookies {  }
     }
 }

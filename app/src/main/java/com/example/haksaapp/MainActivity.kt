@@ -9,11 +9,13 @@ import android.os.Handler
 import android.util.Log
 import android.view.KeyEvent
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import com.example.haksaapp.databinding.ActivityMainBinding
 import com.example.haksaapp.Util.Utility.TAG
 import com.example.haksaapp.Util.CreateNotificationChannel
 import com.example.haksaapp.Util.HttpUrl.BASE_URL
 import com.example.haksaapp.Util.HttpUrl.CURRENT_URL
+import com.example.haksaapp.WebView.CookieController
 import com.example.haksaapp.WebView.WebViewSetting
 
 class MainActivity : AppCompatActivity() {
@@ -49,11 +51,11 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "onCreate: ${AppContext.instance}")
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if((keyCode == KeyEvent.KEYCODE_BACK) && binding.mainWebView.canGoBack()){
             if(CURRENT_URL != BASE_URL && CURRENT_URL != BASE_URL + "Main") {
                 binding.mainWebView.goBack()
-                return true
             }
         }
         if(!exitCheck){
@@ -62,6 +64,7 @@ class MainActivity : AppCompatActivity() {
             Handler().postDelayed(Runnable { exitCheck = false }, 1000)
             return true
         }
+        CookieController().DeleteCookie_All()
         return super.onKeyDown(keyCode, event)
     }
 }

@@ -29,9 +29,6 @@ class WebViewSetting(context: Context){
        // 현재 모바일 데이터 서버 전송
         cookieController.addCookie( "DeviceModel",Build.MODEL.toString())
         cookieController.addCookie("DeviceVersion","Android_" + Build.VERSION.RELEASE)
-        MyFirebaseMessagingService().getToken {
-            cookieController.addCookie( "FBTOK",it)
-        }
 
         initLoading.showDialog()
 
@@ -56,7 +53,6 @@ class WebViewSetting(context: Context){
         binding.mainWebView.webViewClient = object : WebViewClient(){
             override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
                 cookieController.mainCookieHandler(mContext)
-                cookieController.print_Cookie()
 
                 if (url != null) {
                     CURRENT_URL = url
