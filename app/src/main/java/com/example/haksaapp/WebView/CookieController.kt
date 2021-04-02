@@ -26,7 +26,6 @@ class CookieController {
     companion object{
         private var instnce : CookieController? = null
 
-
         fun getInstace(): CookieController =
                 instnce ?: synchronized(this) {
                     instnce ?: CookieController().also {
@@ -71,7 +70,6 @@ class CookieController {
                "studentID_temp" ->{
                    if(checkFirst) {
                        MyFirebaseMessagingService().getToken {
-                           Log.d(TAG, "mainCookieHandler: $it")
                            val okhttpClient = OkHttpClient()
                            val requestBody = FormBody.Builder().apply {
                                add("user_id", cookie.value)
@@ -86,10 +84,8 @@ class CookieController {
                            CoroutineScope(Dispatchers.Default).async {
                                try {
                                    val res = okhttpClient.newCall(request).execute()
-                                   Log.d(TAG, "mainCookieHandler: res : $res")
                                } catch (e: Exception) {
                                    e.printStackTrace()
-                                   Log.d(TAG, "mainCookieHandler Error: $e")
                                }
                            }
                        }

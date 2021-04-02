@@ -19,12 +19,18 @@ class WebViewSetting(context: Context){
     private lateinit var binding : ActivityMainBinding
     private var mContext: Context = context
     private val cookieController = CookieController.getInstace()
-    private val preferencesManager = PreferencesManager()
     val initLoading = LoadingFactory().createLoading(LoadingType.InitLoading, mContext)
     val loadingTimoutHandler = LoadingFactory().createLoading(LoadingType.ChangeUrlLoading, mContext)
+    val preferencesManager = PreferencesManager()
 
     @SuppressLint("SetJavaScriptEnabled")
     fun initBinding(binding: ActivityMainBinding){
+
+        // 자동로그인 기능
+        if(preferencesManager.getString(mContext, "studentID_saveServer") != ""){
+            CURRENT_URL = BASE_URL + "Main"
+            cookieController.addCookie("studentID_save", preferencesManager.getString(mContext, "studentID_saveServe"))
+        }
 
        // 현재 모바일 데이터 서버 전송
         cookieController.addCookie( "DeviceModel",Build.MODEL.toString())
