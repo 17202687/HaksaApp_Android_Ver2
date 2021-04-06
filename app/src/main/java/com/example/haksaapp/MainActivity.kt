@@ -10,22 +10,26 @@ import android.util.Log
 import android.view.KeyEvent
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.example.haksaapp.LoadingProgress.LoadingFactory
+import com.example.haksaapp.LoadingProgress.ProgressDialogLoadingTimoutHandler
 import com.example.haksaapp.databinding.ActivityMainBinding
 import com.example.haksaapp.Util.Utility.TAG
 import com.example.haksaapp.Util.CreateNotificationChannel
 import com.example.haksaapp.Util.HttpUrl.BASE_URL
 import com.example.haksaapp.Util.HttpUrl.CURRENT_URL
+import com.example.haksaapp.Util.LoadingType
 import com.example.haksaapp.WebView.CookieController
 import com.example.haksaapp.WebView.WebViewSetting
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var binding : ActivityMainBinding
+    private lateinit var binding: ActivityMainBinding
 
     // 뒤로가기 두번해야 종료 되게 확인
     private var exitCheck = false
 
-    companion object{
+    companion object {
         // 최초 실행 확인
         private var checkFirst = true
     }
@@ -37,28 +41,38 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // 최초 실행시 사용할 코도
-        if(checkFirst) {
+        if (checkFirst) {
             checkFirst = false
 
             //채널 생성
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 //알람 채널 생성 매니저
                 CreateNotificationChannel().createNotificationChannel(getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
             }
         }
 
         WebViewSetting(this).initBinding(binding)
+        binding.swipeRefreshWebview.setOnRefreshListener(object :
+            SwipeRefreshLayout.OnRefreshListener {
+            override fun onRefresh() {
+                binding.mainWebView.reload()
+                Handler().postDelayed(Runnable {
+                    binding.swipeRefreshWebview.isRefreshing = false
+                }, 800)
+
+            }
+        })
         Log.d(TAG, "onCreate: ${AppContext.instance}")
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-        if((keyCode == KeyEvent.KEYCODE_BACK) && binding.mainWebView.canGoBack()){
-            if(CURRENT_URL != BASE_URL && CURRENT_URL != BASE_URL + "Main") {
+        if ((keyCode == KeyEvent.KEYCODE_BACK) && binding.mainWebView.canGoBack()) {
+            if (CURRENT_URL != BASE_URL && CURRENT_URL != BASE_URL + "Main") {
                 binding.mainWebView.goBack()
             }
         }
-        if(!exitCheck){
+        if (!exitCheck) {
             exitCheck = true
             Toast.makeText(this, "한번 더 누르면 종료됩니다.", Toast.LENGTH_SHORT).show()
             Handler().postDelayed(Runnable { exitCheck = false }, 1000)
@@ -66,5 +80,11 @@ class MainActivity : AppCompatActivity() {
         }
         CookieController().DeleteCookie_All()
         return super.onKeyDown(keyCode, event)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    override fun onDestroy() {
+        CookieController().DeleteCookie_All()
+        super.onDestroy()
     }
 }
