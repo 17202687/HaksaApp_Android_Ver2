@@ -25,12 +25,7 @@ class WebViewSetting(context: Context){
 
     @SuppressLint("SetJavaScriptEnabled")
     fun initBinding(binding: ActivityMainBinding){
-
-        // 자동로그인 기능
-        if(preferencesManager.getString(mContext, "studentID_saveServer") != ""){
-            CURRENT_URL = BASE_URL + "Main"
-            cookieController.addCookie("studentID_save", preferencesManager.getString(mContext, "studentID_saveServe"))
-        }
+        val saveStudentId = preferencesManager.getString(mContext, "studentID_saveServer")
 
        // 현재 모바일 데이터 서버 전송
         cookieController.addCookie( "DeviceModel",Build.MODEL.toString())
@@ -75,7 +70,13 @@ class WebViewSetting(context: Context){
                 initLoading.dismissDialog()
             }
         }
-
         binding.mainWebView.loadUrl(CURRENT_URL)
+        // 자동로그인 기능
+        if(saveStudentId != ""){
+            Log.d(TAG, "initBinding: $saveStudentId")
+            cookieController.addCookie("studentID_save", saveStudentId)
+            CURRENT_URL = BASE_URL + "Main"
+            binding.mainWebView.loadUrl(CURRENT_URL)
+        }
     }
 }
